@@ -5,6 +5,7 @@ import { IissueDetail } from '../types/Issues';
 import IssueCard from '../components/common/IssueCard';
 
 export default function IssueDetail() {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [issue, setIssue] = useState<IissueDetail>({
     number: -1,
     title: '',
@@ -19,16 +20,26 @@ export default function IssueDetail() {
   const issueNumber = parseInt(location.pathname.replace('/', ''));
 
   useEffect(() => {
-    getIssueDetail(issueNumber).then((res) => {
-      setIssue(res.data);
-      console.log(res.data);
-    });
+    const fetchData = () => {
+      setIsLoading(true);
+      getIssueDetail(issueNumber).then((res) => {
+        setIssue(res.data);
+        setIsLoading(false);
+      });
+    };
+    fetchData();
   }, []);
 
   return (
     <div>
-      <IssueCard issue={issue} />
-      <p>{issue.body}</p>
+      {isLoading ? (
+        <p>Loading...</p>
+      ) : (
+        <>
+          <IssueCard issue={issue} />
+          <p>{issue.body}</p>
+        </>
+      )}
     </div>
   );
 }

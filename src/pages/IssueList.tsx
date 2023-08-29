@@ -5,6 +5,7 @@ import { getReactRepoIssues } from '../api/request';
 import { IissueSummary, IissueList } from '../types/Issues';
 
 export default function IssueList() {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [issueList, setIssueList] = useState<IissueList>([
     {
       number: -1,
@@ -17,20 +18,26 @@ export default function IssueList() {
   ]);
 
   useEffect(() => {
-    getReactRepoIssues(0).then((res) => {
-      const extractedData = res.data.map((issue: IissueSummary) => ({
-        number: issue.number,
-        title: issue.title,
-        user: {
-          avatar_url: issue.user ? issue.user.avatar_url : '',
-          login: issue.user ? issue.user.login : '',
-        },
-        created_at: issue.created_at,
-        comments: issue.comments,
-        id: issue.id,
-      }));
-      setIssueList(extractedData);
-    });
+    const fetchData = () => {
+      setIsLoading(true);
+      getReactRepoIssues(0).then((res) => {
+        const extractedData = res.data.map((issue: IissueSummary) => ({
+          number: issue.number,
+          title: issue.title,
+          user: {
+            avatar_url: issue.user ? issue.user.avatar_url : '',
+            login: issue.user ? issue.user.login : '',
+          },
+          created_at: issue.created_at,
+          comments: issue.comments,
+          id: issue.id,
+        }));
+        setIssueList(extractedData);
+        setIsLoading(false);
+      });
+    };
+
+    fetchData();
   }, []);
 
   /*
@@ -46,30 +53,32 @@ export default function IssueList() {
 
   return (
     <Wrapper>
-      {issueList.map((issue, idx) => (
-        <React.Fragment key={issue.id}>
-          {(idx + 1) % 5 === 0 ? (
-            // 다섯 번째 셀인 경우 광고 이미지와 이슈 정보를 함께 출력
-            <>
-              <div>
-                <img
-                  src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSkOlAl9iqWuqE0cvz4agjPYd9zFE2i3IRL3w&usqp=CAU'
-                  alt=''
-                />
-                <hr />
-              </div>
+      {isLoading && <p>Loading...</p>}
+      {!isLoading &&
+        issueList.map((issue, idx) => (
+          <React.Fragment key={issue.id}>
+            {(idx + 1) % 5 === 0 ? (
+              // 다섯 번째 셀인 경우 광고 이미지와 이슈 정보를 함께 출력
+              <>
+                <div>
+                  <img
+                    src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSkOlAl9iqWuqE0cvz4agjPYd9zFE2i3IRL3w&usqp=CAU'
+                    alt=''
+                  />
+                  <hr />
+                </div>
+                <IssueWrapper href={`/${issue.number}`} key={issue.id}>
+                  <IssueCard issue={issue} />
+                </IssueWrapper>
+              </>
+            ) : (
+              // 다섯 번째 셀이 아닌 경우 이슈 정보만 출력
               <IssueWrapper href={`/${issue.number}`} key={issue.id}>
                 <IssueCard issue={issue} />
               </IssueWrapper>
-            </>
-          ) : (
-            // 다섯 번째 셀이 아닌 경우 이슈 정보만 출력
-            <IssueWrapper href={`/${issue.number}`} key={issue.id}>
-              <IssueCard issue={issue} />
-            </IssueWrapper>
-          )}
-        </React.Fragment>
-      ))}
+            )}
+          </React.Fragment>
+        ))}
     </Wrapper>
   );
 }
