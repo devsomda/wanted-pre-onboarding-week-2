@@ -13,3 +13,7 @@ export interface IissueSummary {
 }
 
 export type IissueList = IissueSummary[];
+
+export interface IissueDetail extends IissueSummary {
+  body: string;
+}
