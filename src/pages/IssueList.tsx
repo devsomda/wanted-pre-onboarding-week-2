@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { getReactRepoIssues } from '../api/request';
-import { IissueList } from '../types/Issues';
+import { IissueSummary, IissueList } from '../types/Issues';
 
 export default function IssueList() {
   const [issueList, setIssueList] = useState<IissueList>([
@@ -17,7 +17,7 @@ export default function IssueList() {
 
   useEffect(() => {
     getReactRepoIssues(0).then((res) => {
-      const extractedData = res.data.map((issue) => ({
+      const extractedData = res.data.map((issue: IissueSummary) => ({
         number: issue.number,
         title: issue.title,
         user: {
@@ -35,15 +35,15 @@ export default function IssueList() {
   return (
     <Wrapper>
       {issueList.map((issue) => (
-        <div key={issue.id}>
-          <p>이슈 번호: {issue.number}</p>
+        <IssueCard href={`/${issue.number}`} type='button' key={issue.id}>
+          <p>#{issue.number}</p>
           <p>제목: {issue.title}</p>
           <ProfileImg src={issue.user.avatar_url} alt='' />
           <p>작성자: {issue.user.login}</p>
           <p>작성일: {issue.created_at}</p>
-          <p>댓글 수: {issue.comments}</p>
+          <p>코멘트: {issue.comments}</p>
           <hr />
-        </div>
+        </IssueCard>
       ))}
     </Wrapper>
   );
@@ -51,6 +51,12 @@ export default function IssueList() {
 const Wrapper = styled.section`
   padding: 4em;
   background: lightgray;
+`;
+
+const IssueCard = styled.a`
+  text-decoration: none;
+  color: black;
+  cursor: pointer;
 `;
 
 const ProfileImg = styled.img`

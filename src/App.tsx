@@ -1,13 +1,13 @@
 import React from 'react';
 import Header from './components/common/Header';
-import IssueList from './components/IssueList';
+import Routers from './pages/Routers';
 import styled from 'styled-components';
 
 function App() {
   return (
     <AppWrapper>
       <Header />
-      <IssueList />
+      <Routers />
     </AppWrapper>
   );
 }
