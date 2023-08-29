@@ -11,7 +11,9 @@ export default function Header() {
 }
 
 const Title = styled.header`
-  font-size: 1.5em;
+  font-size: 2em;
   text-align: center;
   font-weight: bold;
+  font-family: 'Times New Roman';
+  margin-bottom: 0.5em;
 `;
