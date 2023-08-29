@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import IssueCard from '../components/common/IssueCard';
 import { getReactRepoIssues } from '../api/request';
 import { IissueSummary, IissueList } from '../types/Issues';
 
@@ -35,15 +36,9 @@ export default function IssueList() {
   return (
     <Wrapper>
       {issueList.map((issue) => (
-        <IssueCard href={`/${issue.number}`} type='button' key={issue.id}>
-          <p>#{issue.number}</p>
-          <p>제목: {issue.title}</p>
-          <ProfileImg src={issue.user.avatar_url} alt='' />
-          <p>작성자: {issue.user.login}</p>
-          <p>작성일: {issue.created_at}</p>
-          <p>코멘트: {issue.comments}</p>
-          <hr />
-        </IssueCard>
+        <IssueWrapper href={`/${issue.number}`} key={issue.id}>
+          <IssueCard issue={issue} />
+        </IssueWrapper>
       ))}
     </Wrapper>
   );
@@ -53,13 +48,8 @@ const Wrapper = styled.section`
   background: lightgray;
 `;
 
-const IssueCard = styled.a`
+const IssueWrapper = styled.a`
   text-decoration: none;
   color: black;
   cursor: pointer;
-`;
-
-const ProfileImg = styled.img`
-  width: 50px;
-  border-radius: 50%;
 `;

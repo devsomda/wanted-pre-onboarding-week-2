@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { getIssueDetail } from '../api/request';
 import { IissueDetail } from '../types/Issues';
-import styled from 'styled-components';
+import IssueCard from '../components/common/IssueCard';
 
 export default function IssueDetail() {
   const [issue, setIssue] = useState<IissueDetail>({
@@ -27,19 +27,8 @@ export default function IssueDetail() {
 
   return (
     <div>
-      <p>#{issue.number}</p>
-      <p>제목: {issue.title}</p>
-      <ProfileImg src={issue.user.avatar_url} alt='' />
-      <p>작성자: {issue.user.login}</p>
-      <p>작성일: {issue.created_at}</p>
-      <p>코멘트: {issue.comments}</p>
-      <hr />
+      <IssueCard issue={issue} />
       <p>{issue.body}</p>
     </div>
   );
 }
-
-const ProfileImg = styled.img`
-  width: 50px;
-  border-radius: 50%;
-`;
