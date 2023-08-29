@@ -33,12 +33,42 @@ export default function IssueList() {
     });
   }, []);
 
+  /*
+  광고를 구현하는 방식에 대한 고민
+  1. fetchData()를 할 때, array.splice를 사용해 
+  받아온 배열의 다섯번째 인덱스에 광고 이미지를 추가하는 방식 
+    -> 배열이 가지고 있어야할 issue 정보를 가지지 못하는 문제
+  2. issue 4개 + 광고 1개를 묶는 컴포넌트를 생성하는 방식 
+    -> 불필요한 depth가 생긴다 판단 됨
+  3. 인덱스가 다섯번째 일 때 광고 + issue 를 함게 표현하는 방식 
+    -> 채택하였으나, 광고가 하나가 아니라 여러개의 배열로 들어올 때 확장성이 다소 떨어질 것으로 예상 됨
+  */
+
   return (
     <Wrapper>
-      {issueList.map((issue) => (
-        <IssueWrapper href={`/${issue.number}`} key={issue.id}>
-          <IssueCard issue={issue} />
-        </IssueWrapper>
+      {issueList.map((issue, idx) => (
+        <React.Fragment key={issue.id}>
+          {(idx + 1) % 5 === 0 ? (
+            // 다섯 번째 셀인 경우 광고 이미지와 이슈 정보를 함께 출력
+            <>
+              <div>
+                <img
+                  src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSkOlAl9iqWuqE0cvz4agjPYd9zFE2i3IRL3w&usqp=CAU'
+                  alt=''
+                />
+                <hr />
+              </div>
+              <IssueWrapper href={`/${issue.number}`} key={issue.id}>
+                <IssueCard issue={issue} />
+              </IssueWrapper>
+            </>
+          ) : (
+            // 다섯 번째 셀이 아닌 경우 이슈 정보만 출력
+            <IssueWrapper href={`/${issue.number}`} key={issue.id}>
+              <IssueCard issue={issue} />
+            </IssueWrapper>
+          )}
+        </React.Fragment>
       ))}
     </Wrapper>
   );
