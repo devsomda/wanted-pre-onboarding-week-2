@@ -9,45 +9,7 @@ export default function IssueList() {
   const [page, setPage] = useState<number>(0);
   const [issueList, setIssueList] = useState<IissueList>([]);
 
-  const fetchData = (pageNumber: number) => {
-    setIsLoading(true);
-    getReactRepoIssues(pageNumber).then((res) => {
-      const extractedData = res.data.map((issue: IissueSummary) => ({
-        number: issue.number,
-        title: issue.title,
-        user: {
-          avatar_url: issue.user ? issue.user.avatar_url : '',
-          login: issue.user ? issue.user.login : '',
-        },
-        created_at: issue.created_at,
-        comments: issue.comments,
-        id: issue.id,
-      }));
-
-      setIssueList((prev) => [...prev, ...extractedData]);
-      setIsLoading(false);
-    });
-  };
-
   useEffect(() => {
-    // 두번째 useEffect와 충돌 방지
-    /* 
-    FIXME:
-    page의 초기값을 1로 해두었을 때,
-    두번째 useEffect가 바로 실행되면서 초기 화면부터 페이지 1,2가 한번에 호출 되는
-    문제가 있었습니다.
-    초기값을 0으로 바꾸고, 0일 때는 실행이 안되게 함으로서 최초에 두 번 불러와지는
-    문제는 임시적으로 막았으나
-    매번 조건을 검사해야하는 게 옳은가? 하는 생각이 듭니다.
-    */
-    console.log('데이터 불러오기');
-    if (page !== 0) {
-      fetchData(page);
-    }
-  }, [page]);
-
-  useEffect(() => {
-    console.log('최초 이펙트ㄴ');
     const handleObserver = (entries: IntersectionObserverEntry[]) => {
       const target = entries[0];
       if (target.isIntersecting && !isLoading) {
@@ -67,6 +29,46 @@ export default function IssueList() {
       }
     };
   }, []);
+
+  // 첫번째 useEffect와 충돌 방지
+  /* 
+  FIXME:
+  page의 초기값을 1로 해두었을 때,
+  첫번째 useEffect가 바로 실행되면서 초기 화면부터 페이지 1,2가 한번에 호출 되는
+  문제가 있었습니다.
+  초기값을 0으로 바꾸고, 0일 때는 실행이 안되게 함으로서 최초에 두 번 불러와지는
+  문제는 임시적으로 막았으나
+  매번 조건을 검사해야하는 게 옳은가? 하는 생각이 듭니다.
+  */
+  useEffect(() => {
+    if (page !== 0) {
+      fetchData(page);
+    }
+  }, [page]);
+
+  const fetchData = (pageNumber: number) => {
+    setIsLoading(true);
+    getReactRepoIssues(pageNumber)
+      .then((res) => {
+        const extractedData = res.data.map((issue: IissueSummary) => ({
+          number: issue.number,
+          title: issue.title,
+          user: {
+            avatar_url: issue.user ? issue.user.avatar_url : '',
+            login: issue.user ? issue.user.login : '',
+          },
+          created_at: issue.created_at,
+          comments: issue.comments,
+          id: issue.id,
+        }));
+
+        setIssueList((prev) => [...prev, ...extractedData]);
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  };
 
   /*
   광고를 구현하는 방식에 대한 고민
@@ -91,8 +93,8 @@ export default function IssueList() {
                   src='https://image.wanted.co.kr/optimize?src=https%3A%2F%2Fstatic.wanted.co.kr%2Fimages%2Fuserweb%2Flogo_wanted_black.png&w=110&q=100'
                   alt='ad-image'
                 />
-                <hr />
               </a>
+              <hr />
               <IssueWrapper href={`/${issue.number}`} key={issue.id}>
                 <IssueCard issue={issue} />
               </IssueWrapper>
@@ -115,6 +117,7 @@ export default function IssueList() {
     </Wrapper>
   );
 }
+
 const Wrapper = styled.section`
   padding: 4em;
   background: lightgray;
