@@ -92,12 +92,12 @@ export default function IssueList() {
           {(idx + 1) % 5 === 0 ? (
             // 다섯 번째 셀인 경우 광고 이미지와 이슈 정보를 함께 출력
             <>
-              <a href='https://www.wanted.co.kr/ '>
+              <AdImageWrapper href='https://www.wanted.co.kr/ '>
                 <img
                   src='https://image.wanted.co.kr/optimize?src=https%3A%2F%2Fstatic.wanted.co.kr%2Fimages%2Fuserweb%2Flogo_wanted_black.png&w=110&q=100'
                   alt='ad-image'
                 />
-              </a>
+              </AdImageWrapper>
               <hr />
               <IssueWrapper href={`/${issue.number}`} key={issue.id}>
                 <IssueCard issue={issue} />
@@ -123,11 +123,16 @@ export default function IssueList() {
 
 const Wrapper = styled.section`
   padding: 4em;
-  background: lightgray;
+  background: #e9e9e9;
 `;
 
 const IssueWrapper = styled.a`
   text-decoration: none;
   color: black;
   cursor: pointer;
+`;
+
+const AdImageWrapper = styled.a`
+  display: flex;
+  justify-content: center;
 `;

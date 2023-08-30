@@ -15,7 +15,10 @@ function App() {
 export default App;
 
 const AppWrapper = styled.div`
-  margin: 1rem;
+  width: 90%;
+  max-width: 800px;
+  margin: 1rem auto;
   padding: 1rem;
   border: 1px solid lightgray;
+  font-family: 'Times New Roman';
 `;
