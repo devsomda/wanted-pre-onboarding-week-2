@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown';
 import { getIssueDetail } from '../api/request';
 import { IissueDetail } from '../types/Issues';
 import IssueCard from '../components/common/IssueCard';
@@ -37,7 +38,7 @@ export default function IssueDetail() {
       ) : (
         <>
           <IssueCard issue={issue} />
-          <p>{issue.body}</p>
+          <ReactMarkdown>{issue.body}</ReactMarkdown>
         </>
       )}
     </div>
