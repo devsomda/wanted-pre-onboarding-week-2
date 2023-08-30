@@ -40,12 +40,14 @@ export default function IssueList() {
     문제는 임시적으로 막았으나
     매번 조건을 검사해야하는 게 옳은가? 하는 생각이 듭니다.
     */
+    console.log('데이터 불러오기');
     if (page !== 0) {
       fetchData(page);
     }
   }, [page]);
 
   useEffect(() => {
+    console.log('최초 이펙트ㄴ');
     const handleObserver = (entries: IntersectionObserverEntry[]) => {
       const target = entries[0];
       if (target.isIntersecting && !isLoading) {
@@ -84,16 +86,13 @@ export default function IssueList() {
           {(idx + 1) % 5 === 0 ? (
             // 다섯 번째 셀인 경우 광고 이미지와 이슈 정보를 함께 출력
             <>
-              <div>
-                <p style={{ color: 'red' }}>
-                  이슈:{issue.id}, 인덱스:{idx}
-                </p>
+              <a href='https://www.wanted.co.kr/ '>
                 <img
-                  src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSkOlAl9iqWuqE0cvz4agjPYd9zFE2i3IRL3w&usqp=CAU'
-                  alt=''
+                  src='https://image.wanted.co.kr/optimize?src=https%3A%2F%2Fstatic.wanted.co.kr%2Fimages%2Fuserweb%2Flogo_wanted_black.png&w=110&q=100'
+                  alt='ad-image'
                 />
                 <hr />
-              </div>
+              </a>
               <IssueWrapper href={`/${issue.number}`} key={issue.id}>
                 <IssueCard issue={issue} />
               </IssueWrapper>
@@ -101,9 +100,6 @@ export default function IssueList() {
           ) : (
             // 다섯 번째 셀이 아닌 경우 이슈 정보만 출력
             <IssueWrapper href={`/${issue.number}`} key={issue.id}>
-              <p style={{ color: 'red' }}>
-                이슈:{issue.id}, 인덱스:{idx}
-              </p>
               <IssueCard issue={issue} />
             </IssueWrapper>
           )}
