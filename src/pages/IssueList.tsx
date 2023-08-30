@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import IssueCard from '../components/common/IssueCard';
 import { getReactRepoIssues } from '../api/request';
 import { IissueSummary, IissueList } from '../types/Issues';
+import IssueCard from '../components/common/IssueCard';
 import Loading from '../components/common/Loading';
+import useObserver from '../components/hooks/useObserver';
+import AdImage from '../components/IssueList/AdImage';
+import { INFINITE_SCROLL_STANDARD } from '../constants';
 
 export default function IssueList() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -11,24 +14,8 @@ export default function IssueList() {
   const [issueList, setIssueList] = useState<IissueList>([]);
 
   useEffect(() => {
-    const handleObserver = (entries: IntersectionObserverEntry[]) => {
-      const target = entries[0];
-      if (target.isIntersecting && !isLoading) {
-        setPage((prevPage) => prevPage + 1);
-      }
-    };
-    const observer = new IntersectionObserver(handleObserver, {
-      threshold: 1, //  Intersection Observer의 옵션, 0일 때는 교차점이 한 번만 발생해도 실행, 1은 모든 영역이 교차해야 콜백 함수가 실행.
-    });
-    const observerTarget = document.getElementById('bottom-of-page');
-    if (observerTarget) {
-      observer.observe(observerTarget);
-    }
-    return () => {
-      if (observerTarget) {
-        observer.unobserve(observerTarget);
-      }
-    };
+    const callback = () => setPage((prevPage) => prevPage + 1);
+    useObserver(isLoading, callback);
   }, []);
 
   // 첫번째 useEffect와 충돌 방지
@@ -87,18 +74,13 @@ export default function IssueList() {
 
   return (
     <Wrapper>
+      {isLoading && <Loading />}
       {issueList.map((issue, idx) => (
         <React.Fragment key={issue.id}>
           {(idx + 1) % 5 === 0 ? (
             // 다섯 번째 셀인 경우 광고 이미지와 이슈 정보를 함께 출력
             <>
-              <AdImageWrapper href='https://www.wanted.co.kr/ '>
-                <img
-                  src='https://image.wanted.co.kr/optimize?src=https%3A%2F%2Fstatic.wanted.co.kr%2Fimages%2Fuserweb%2Flogo_wanted_black.png&w=110&q=100'
-                  alt='ad-image'
-                />
-              </AdImageWrapper>
-              <hr />
+              <AdImage />
               <IssueWrapper href={`/${issue.number}`} key={issue.id}>
                 <IssueCard issue={issue} />
               </IssueWrapper>
@@ -115,8 +97,7 @@ export default function IssueList() {
           )}
         </React.Fragment>
       ))}
-      {isLoading && <Loading />}
-      <div id='bottom-of-page' style={{ height: '10px' }}></div>
+      <InfinitScrollPoint id={INFINITE_SCROLL_STANDARD}></InfinitScrollPoint>
     </Wrapper>
   );
 }
@@ -132,7 +113,6 @@ const IssueWrapper = styled.a`
   cursor: pointer;
 `;
 
-const AdImageWrapper = styled.a`
-  display: flex;
-  justify-content: center;
+const InfinitScrollPoint = styled.div`
+  height: 20px;
 `;
