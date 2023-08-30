@@ -6,38 +6,64 @@ import { IissueSummary, IissueList } from '../types/Issues';
 
 export default function IssueList() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [issueList, setIssueList] = useState<IissueList>([
-    {
-      number: -1,
-      title: '',
-      user: { avatar_url: '', login: '' },
-      created_at: '',
-      comments: -1,
-      id: -1,
-    },
-  ]);
+  const [page, setPage] = useState<number>(0);
+  const [issueList, setIssueList] = useState<IissueList>([]);
+
+  const fetchData = (pageNumber: number) => {
+    setIsLoading(true);
+    getReactRepoIssues(pageNumber).then((res) => {
+      const extractedData = res.data.map((issue: IissueSummary) => ({
+        number: issue.number,
+        title: issue.title,
+        user: {
+          avatar_url: issue.user ? issue.user.avatar_url : '',
+          login: issue.user ? issue.user.login : '',
+        },
+        created_at: issue.created_at,
+        comments: issue.comments,
+        id: issue.id,
+      }));
+
+      setIssueList((prev) => [...prev, ...extractedData]);
+      setIsLoading(false);
+    });
+  };
 
   useEffect(() => {
-    const fetchData = () => {
-      setIsLoading(true);
-      getReactRepoIssues(0).then((res) => {
-        const extractedData = res.data.map((issue: IissueSummary) => ({
-          number: issue.number,
-          title: issue.title,
-          user: {
-            avatar_url: issue.user ? issue.user.avatar_url : '',
-            login: issue.user ? issue.user.login : '',
-          },
-          created_at: issue.created_at,
-          comments: issue.comments,
-          id: issue.id,
-        }));
-        setIssueList(extractedData);
-        setIsLoading(false);
-      });
-    };
+    // 두번째 useEffect와 충돌 방지
+    /* 
+    FIXME:
+    page의 초기값을 1로 해두었을 때,
+    두번째 useEffect가 바로 실행되면서 초기 화면부터 페이지 1,2가 한번에 호출 되는
+    문제가 있었습니다.
+    초기값을 0으로 바꾸고, 0일 때는 실행이 안되게 함으로서 최초에 두 번 불러와지는
+    문제는 임시적으로 막았으나
+    매번 조건을 검사해야하는 게 옳은가? 하는 생각이 듭니다.
+    */
+    if (page !== 0) {
+      fetchData(page);
+    }
+  }, [page]);
 
-    fetchData();
+  useEffect(() => {
+    const handleObserver = (entries: IntersectionObserverEntry[]) => {
+      const target = entries[0];
+      if (target.isIntersecting && !isLoading) {
+        setPage((prevPage) => prevPage + 1);
+      }
+    };
+    const observer = new IntersectionObserver(handleObserver, {
+      threshold: 1, //  Intersection Observer의 옵션, 0일 때는 교차점이 한 번만 발생해도 실행, 1은 모든 영역이 교차해야 콜백 함수가 실행.
+    });
+    const observerTarget = document.getElementById('bottom-of-page');
+    if (observerTarget) {
+      observer.observe(observerTarget);
+    }
+    return () => {
+      if (observerTarget) {
+        observer.unobserve(observerTarget);
+      }
+    };
   }, []);
 
   /*
@@ -53,32 +79,43 @@ export default function IssueList() {
 
   return (
     <Wrapper>
-      {isLoading && <p>Loading...</p>}
-      {!isLoading &&
-        issueList.map((issue, idx) => (
-          <React.Fragment key={issue.id}>
-            {(idx + 1) % 5 === 0 ? (
-              // 다섯 번째 셀인 경우 광고 이미지와 이슈 정보를 함께 출력
-              <>
-                <div>
-                  <img
-                    src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSkOlAl9iqWuqE0cvz4agjPYd9zFE2i3IRL3w&usqp=CAU'
-                    alt=''
-                  />
-                  <hr />
-                </div>
-                <IssueWrapper href={`/${issue.number}`} key={issue.id}>
-                  <IssueCard issue={issue} />
-                </IssueWrapper>
-              </>
-            ) : (
-              // 다섯 번째 셀이 아닌 경우 이슈 정보만 출력
+      {issueList.map((issue, idx) => (
+        <React.Fragment key={issue.id}>
+          {(idx + 1) % 5 === 0 ? (
+            // 다섯 번째 셀인 경우 광고 이미지와 이슈 정보를 함께 출력
+            <>
+              <div>
+                <p style={{ color: 'red' }}>
+                  이슈:{issue.id}, 인덱스:{idx}
+                </p>
+                <img
+                  src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSkOlAl9iqWuqE0cvz4agjPYd9zFE2i3IRL3w&usqp=CAU'
+                  alt=''
+                />
+                <hr />
+              </div>
               <IssueWrapper href={`/${issue.number}`} key={issue.id}>
                 <IssueCard issue={issue} />
               </IssueWrapper>
-            )}
-          </React.Fragment>
-        ))}
+            </>
+          ) : (
+            // 다섯 번째 셀이 아닌 경우 이슈 정보만 출력
+            <IssueWrapper href={`/${issue.number}`} key={issue.id}>
+              <p style={{ color: 'red' }}>
+                이슈:{issue.id}, 인덱스:{idx}
+              </p>
+              <IssueCard issue={issue} />
+            </IssueWrapper>
+          )}
+        </React.Fragment>
+      ))}
+      {isLoading && (
+        <LoadingContainer>
+          <p>Loading...</p>
+        </LoadingContainer>
+      )}
+
+      <div id='bottom-of-page' style={{ height: '10px' }}></div>
     </Wrapper>
   );
 }
@@ -91,4 +128,17 @@ const IssueWrapper = styled.a`
   text-decoration: none;
   color: black;
   cursor: pointer;
+`;
+
+const LoadingContainer = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999; /* 다른 요소 위로 표시되도록 설정 */
 `;
