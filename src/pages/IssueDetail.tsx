@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import { getIssueDetail } from '../api/request';
 import { IissueDetail } from '../types/Issues';
@@ -17,16 +17,23 @@ export default function IssueDetail() {
     body: '',
   });
 
+  const navigate = useNavigate();
   const location = useLocation();
   const issueNumber = parseInt(location.pathname.replace('/', ''));
 
   useEffect(() => {
     const fetchData = () => {
       setIsLoading(true);
-      getIssueDetail(issueNumber).then((res) => {
-        setIssue(res.data);
-        setIsLoading(false);
-      });
+      getIssueDetail(issueNumber)
+        .then((res) => {
+          setIssue(res.data);
+          setIsLoading(false);
+        })
+        .catch(() => {
+          setIsLoading(false);
+          alert('잘못된 접근입니다.');
+          navigate('/error');
+        });
     };
     fetchData();
   }, []);
