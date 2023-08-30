@@ -7,11 +7,13 @@ import Loading from '../components/common/Loading';
 import useObserver from '../components/hooks/useObserver';
 import AdImage from '../components/IssueList/AdImage';
 import { INFINITE_SCROLL_STANDARD } from '../constants';
+import { useIssueListContext } from '../contexts/IssueContext';
 
 export default function IssueList() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [page, setPage] = useState<number>(0);
-  const [issueList, setIssueList] = useState<IissueList>([]);
+  // const [issueList, setIssueList] = useState<IissueList>([]);
+  const { issueList, setIssueList } = useIssueListContext();
 
   useEffect(() => {
     const callback = () => setPage((prevPage) => prevPage + 1);
@@ -50,6 +52,7 @@ export default function IssueList() {
           id: issue.id,
         }));
 
+        // setIssueList((prev) => [...prev, ...extractedData]);
         setIssueList((prev) => [...prev, ...extractedData]);
         setTimeout(() => {
           setIsLoading(false);
