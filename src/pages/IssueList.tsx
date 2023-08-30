@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import IssueCard from '../components/common/IssueCard';
 import { getReactRepoIssues } from '../api/request';
 import { IissueSummary, IissueList } from '../types/Issues';
+import Loading from '../components/common/Loading';
 
 export default function IssueList() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -63,9 +64,12 @@ export default function IssueList() {
         }));
 
         setIssueList((prev) => [...prev, ...extractedData]);
-        setIsLoading(false);
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 100);
       })
       .catch((err) => {
+        setIsLoading(false);
         console.error(err);
       });
   };
@@ -98,21 +102,20 @@ export default function IssueList() {
               <IssueWrapper href={`/${issue.number}`} key={issue.id}>
                 <IssueCard issue={issue} />
               </IssueWrapper>
+              <hr />
             </>
           ) : (
             // 다섯 번째 셀이 아닌 경우 이슈 정보만 출력
-            <IssueWrapper href={`/${issue.number}`} key={issue.id}>
-              <IssueCard issue={issue} />
-            </IssueWrapper>
+            <>
+              <IssueWrapper href={`/${issue.number}`} key={issue.id}>
+                <IssueCard issue={issue} />
+              </IssueWrapper>
+              <hr />
+            </>
           )}
         </React.Fragment>
       ))}
-      {isLoading && (
-        <LoadingContainer>
-          <p>Loading...</p>
-        </LoadingContainer>
-      )}
-
+      {isLoading && <Loading />}
       <div id='bottom-of-page' style={{ height: '10px' }}></div>
     </Wrapper>
   );
@@ -127,17 +130,4 @@ const IssueWrapper = styled.a`
   text-decoration: none;
   color: black;
   cursor: pointer;
-`;
-
-const LoadingContainer = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(255, 255, 255, 0.8);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 999; /* 다른 요소 위로 표시되도록 설정 */
 `;

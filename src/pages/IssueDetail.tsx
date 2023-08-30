@@ -4,6 +4,7 @@ import ReactMarkdown from 'react-markdown';
 import { getIssueDetail } from '../api/request';
 import { IissueDetail } from '../types/Issues';
 import IssueCard from '../components/common/IssueCard';
+import Loading from '../components/common/Loading';
 
 export default function IssueDetail() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -27,7 +28,9 @@ export default function IssueDetail() {
       getIssueDetail(issueNumber)
         .then((res) => {
           setIssue(res.data);
-          setIsLoading(false);
+          setTimeout(() => {
+            setIsLoading(false);
+          }, 300);
         })
         .catch(() => {
           setIsLoading(false);
@@ -41,7 +44,7 @@ export default function IssueDetail() {
   return (
     <div>
       {isLoading ? (
-        <p>Loading...</p>
+        <Loading />
       ) : (
         <>
           <IssueCard issue={issue} />
