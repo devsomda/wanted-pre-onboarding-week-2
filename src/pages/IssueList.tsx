@@ -77,20 +77,21 @@ export default function IssueList() {
       {isLoading && <Loading />}
       {issueList.map((issue, idx) => (
         <React.Fragment key={issue.id}>
-          {(idx + 1) % 5 === 0 ? (
-            // 다섯 번째 셀인 경우 광고 이미지와 이슈 정보를 함께 출력
+          {(idx + 1) % 4 === 0 ? (
+            // 네 번째 셀인 경우 이슈 정보 하단 광고 이미지
             <>
-              <AdImage />
               <IssueWrapper href={`/${issue.number}`} key={issue.id}>
                 <IssueCard issue={issue} />
+                {idx}
               </IssueWrapper>
               <hr />
+              <AdImage />
             </>
           ) : (
-            // 다섯 번째 셀이 아닌 경우 이슈 정보만 출력
             <>
               <IssueWrapper href={`/${issue.number}`} key={issue.id}>
                 <IssueCard issue={issue} />
+                {idx}
               </IssueWrapper>
               <hr />
             </>
