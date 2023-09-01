@@ -48,7 +48,13 @@ export default function IssueDetail() {
       ) : (
         <>
           <IssueCard issue={issue} />
-          <ReactMarkdown>{issue.body}</ReactMarkdown>
+          <ReactMarkdown
+            components={{
+              img: ({ node, ...props }) => <img style={{ maxWidth: '100%' }} {...props} alt='' />,
+            }}
+          >
+            {issue.body}
+          </ReactMarkdown>
         </>
       )}
     </div>
