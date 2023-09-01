@@ -15,21 +15,9 @@ export default function IssueList() {
   // const [issueList, setIssueList] = useState<IissueList>([]);
   const { issueList, setIssueList } = useIssueListContext();
 
-  useEffect(() => {
-    const callback = () => setPage((prevPage) => prevPage + 1);
-    useObserver(isLoading, callback);
-  }, []);
+  const callback = () => setPage((prevPage) => prevPage + 1);
+  useObserver(isLoading, callback);
 
-  // 첫번째 useEffect와 충돌 방지
-  /* 
-  FIXME:
-  page의 초기값을 1로 해두었을 때,
-  첫번째 useEffect가 바로 실행되면서 초기 화면부터 페이지 1,2가 한번에 호출 되는
-  문제가 있었습니다.
-  초기값을 0으로 바꾸고, 0일 때는 실행이 안되게 함으로서 최초에 두 번 불러와지는
-  문제는 임시적으로 막았으나
-  매번 조건을 검사해야하는 게 옳은가? 하는 생각이 듭니다.
-  */
   useEffect(() => {
     if (page !== 0) {
       fetchData(page);
