@@ -7,7 +7,8 @@
 ## 🧑🏻‍💻 프로젝트 정보
 
 ### 실행 방법
-- 아래 명령어를 차례대로 입력하여 실행해주세요.
+배포 링크: https://read-github-issues.netlify.app/
+- 사이트에 접속할 수 없는 경우, 아래 명령어를 차례대로 입력하여 실행해주세요.
 
 ```jsx
 git clone https://github.com/devsomda/wanted-pre-onboarding-week-2
